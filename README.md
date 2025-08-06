@@ -1,7 +1,10 @@
-# Next.js + Django Fullstack Template (Backend)
+# EcoGrow 🌱 (Backend)
 
-This is the **Django + Django REST Framework** backend template for full-stack projects.  
-It is designed to be used with a [Next.js + TypeScript frontend template](https://github.com/kaseyendsley/nextjs-django-template-frontend).
+EcoGrow helps users build climate-conscious habits through sustainability quests. Users can create and undertake challenges across categories like food, transportation, and energy, share their progress with photos and reflections, and connect with users who share their values. Whether it’s reducing waste, trying eco-friendly swaps, or learning new green habits, EcoGrow makes sustainable living approachable and fun. 
+
+The EcoGrow Backend is a Python/Django REST Framework API that powers user authentication, quest management, and habit tracking. It provides secure, scalable RESTful endpoints designed for seamless frontend integration and future growth.  
+
+The frontend for EcoGrow, built with Next.js and TailwindCSS, can be found here: [EcoGrow Frontend Repository](https://github.com/kaseyendsley/EcoGrow-frontend)
 
 ---
 
@@ -58,13 +61,6 @@ core/           # Core app with health endpoint
 manage.py       # Django project manager
 pyproject.toml  # Poetry dependencies
 ```
-
----
-
-## Next Steps
-- Add more apps for project-specific features
-- Connect to PostgreSQL (for production)
-- Add authentication or other common middleware
 
 ---
 
