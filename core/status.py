@@ -3,6 +3,3 @@ from django.http import JsonResponse
 
 def health(request):
     return JsonResponse({"status": "EcoGrow backend is running!"})
-
-
-# Create your views here.

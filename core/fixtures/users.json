@@ -1,0 +1,28 @@
+[
+  {
+    "model": "core.user",
+    "pk": 1,
+    "fields": {
+      "username": "eco_admin",
+      "email": "admin@ecogrow.app",
+      "password": "HASH_FOR_ADMIN",
+      "is_moderator": true,
+      "is_superuser": true,
+      "is_staff": true,
+      "profile_img": "https://picsum.photos/seed/ecoadmin/200"
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 2,
+    "fields": {
+      "username": "eco_user",
+      "email": "user@ecogrow.app",
+      "password": "HASH_FOR_USER",
+      "is_moderator": false,
+      "is_superuser": false,
+      "is_staff": false,
+      "profile_img": "https://picsum.photos/seed/ecouser/200"
+    }
+  }
+]
