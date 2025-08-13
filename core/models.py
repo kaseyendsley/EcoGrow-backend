@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.db.models import Q
 
 class User(AbstractUser):
     profile_img = models.URLField(blank=True, null=True)
@@ -50,3 +51,41 @@ class Quest(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class UserQuest(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="user_quests",
+    )
+    quest = models.ForeignKey(
+        "core.Quest",
+        on_delete=models.CASCADE,
+        related_name="user_quests",
+    )
+
+    # progress
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    # completion data
+    reflection = models.TextField(blank=True)  # required on completion; optional before
+    photo_url = models.URLField(blank=True)    # optional
+    # 1–5 in 0.5 steps; kept nullable until completion
+    rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)
+
+    class Meta:
+        # allow repeats after completion, but only ONE active at a time
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "quest"],
+                condition=Q(completed=False),
+                name="unique_active_user_quest_per_user_and_quest",
+            )
+        ]
+
+    def __str__(self):
+        status = "completed" if self.completed else "in-progress"
+        return f"UserQuest(user={self.user_id}, quest={self.quest_id}, {status})"
+
