@@ -22,10 +22,18 @@ from core.status import health
 from core.views.auth_views import RegisterView
 from core.views.me_views import MeView
 from core.views.logout_views import LogoutView
-from core.views.quest_views import QuestViewSet  # where you put it
+from core.views.quest_views import QuestViewSet
+from core.views.user_quest_views import UserQuestViewSet 
+from core.views.catalog_views import CategoryViewSet, TagViewSet, DifficultyViewSet, IconViewSet 
 
 router = DefaultRouter()
 router.register(r"quests", QuestViewSet, basename="quest")
+router.register(r"user-quests", UserQuestViewSet, basename="userquest")
+router.register(r"categories", CategoryViewSet, basename="category")     
+router.register(r"tags", TagViewSet, basename="tag")                    
+router.register(r"difficulties", DifficultyViewSet, basename="difficulty") 
+router.register(r"icons", IconViewSet, basename="icon")                 
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

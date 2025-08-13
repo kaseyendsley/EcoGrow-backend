@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from core.models import Category, Icon, Difficulty, Tag, Quest
+from core.models import Category, Icon, Difficulty, Tag, Quest, UserQuest
+from decimal import Decimal
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -78,3 +79,54 @@ class QuestSerializer(serializers.ModelSerializer):
         if tags is not None:
             instance.tags.set(tags)
         return instance
+
+
+def validate_half_star(value: Decimal) -> Decimal:
+    # allow 1.0 .. 5.0 in 0.5 steps
+    try:
+        d = Decimal(value)
+    except Exception:
+        raise serializers.ValidationError("Rating must be a number like 3, 4.5, etc.")
+    if d < Decimal("1.0") or d > Decimal("5.0"):
+        raise serializers.ValidationError("Rating must be between 1 and 5.")
+    if (d * 2) % 1 != 0:
+        raise serializers.ValidationError("Rating must be in 0.5 increments.")
+    return d
+
+class UserQuestSerializer(serializers.ModelSerializer):
+    quest = QuestSerializer(read_only=True)
+    quest_id = serializers.PrimaryKeyRelatedField(
+        source="quest", queryset=Quest.objects.all(), write_only=True
+    )
+
+    class Meta:
+        model = UserQuest
+        fields = (
+            "id",
+            "quest", "quest_id",
+            "completed", "completed_at",
+            "reflection", "photo_url", "rating",
+        )
+        read_only_fields = ("completed", "completed_at")
+
+    def validate_rating(self, value):
+        # Only validate if provided (rating required at completion, not at create)
+        if value is None:
+            return value
+        return validate_half_star(value)
+
+class CompleteUserQuestSerializer(serializers.ModelSerializer):
+    # reflection & rating required, photo_url optional, allow client to send completed_at
+    rating = serializers.DecimalField(max_digits=2, decimal_places=1)
+
+    class Meta:
+        model = UserQuest
+        fields = ("reflection", "rating", "photo_url", "completed_at")
+
+    def validate_rating(self, value):
+        return validate_half_star(value)
+
+    def validate_reflection(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Reflection is required.")
+        return value
