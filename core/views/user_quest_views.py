@@ -60,14 +60,10 @@ class UserQuestViewSet(viewsets.ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-        # allow cancel only if in-progress (optional; comment out to always allow)
-        instance = self.get_object()
-        if instance.completed:
-            return Response(
-                {"detail": "Completed quests cannot be deleted."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+    # allow delete regardless of completion status
+        instance = self.get_object()  # already restricted to current user via get_queryset
         return super().destroy(request, *args, **kwargs)
+
 
     @action(detail=True, methods=["post"])
     def complete(self, request, pk=None):
