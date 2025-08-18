@@ -22,9 +22,9 @@ class QuestViewSet(viewsets.ModelViewSet):
         ctx["request"] = self.request
         return ctx
 
-    # DELETE safety net (optional; permission checks already handle it)
+    # DELETE is admin-only; owners may edit but cannot delete
     def perform_destroy(self, instance):
         user = self.request.user
-        if not (user.is_staff or instance.created_by_id == user.id):
-            raise PermissionDenied("Only the creator or staff can delete this quest.")
+        if not (user and user.is_authenticated and user.is_staff):
+            raise PermissionDenied("Only admins can delete quests.")
         instance.delete()
