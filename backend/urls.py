@@ -26,6 +26,9 @@ from core.views.quest_views import QuestViewSet
 from core.views.user_quest_views import UserQuestViewSet 
 from core.views.catalog_views import CategoryViewSet, TagViewSet, DifficultyViewSet, IconViewSet 
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 router = DefaultRouter()
 router.register(r"quests", QuestViewSet, basename="quest")
 router.register(r"user-quests", UserQuestViewSet, basename="userquest")
@@ -48,3 +51,6 @@ urlpatterns = [
     # API endpoints from ViewSets
     path("api/", include(router.urls)),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

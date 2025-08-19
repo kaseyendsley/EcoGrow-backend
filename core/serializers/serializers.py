@@ -93,11 +93,14 @@ def validate_half_star(value: Decimal) -> Decimal:
         raise serializers.ValidationError("Rating must be in 0.5 increments.")
     return d
 
+
 class UserQuestSerializer(serializers.ModelSerializer):
     quest = QuestSerializer(read_only=True)
     quest_id = serializers.PrimaryKeyRelatedField(
         source="quest", queryset=Quest.objects.all(), write_only=True
     )
+    # Expose stored file path/URL from ImageField (read-only)
+    photo = serializers.ImageField(read_only=True)
 
     class Meta:
         model = UserQuest
@@ -105,7 +108,8 @@ class UserQuestSerializer(serializers.ModelSerializer):
             "id",
             "quest", "quest_id",
             "completed", "completed_at",
-            "reflection", "photo_url", "rating",
+            "reflection", "rating",
+            "photo",  # read-only output of uploaded image
         )
         read_only_fields = ("completed", "completed_at")
 
@@ -115,13 +119,18 @@ class UserQuestSerializer(serializers.ModelSerializer):
             return value
         return validate_half_star(value)
 
+
 class CompleteUserQuestSerializer(serializers.ModelSerializer):
-    # reflection & rating required, photo_url optional, allow client to send completed_at
+    """
+    Completion requires reflection, rating, and an uploaded photo file.
+    No external links allowed.
+    """
     rating = serializers.DecimalField(max_digits=2, decimal_places=1)
+    photo = serializers.ImageField(required=True)  # upload-only requirement
 
     class Meta:
         model = UserQuest
-        fields = ("reflection", "rating", "photo_url", "completed_at")
+        fields = ("reflection", "rating", "photo", "completed_at")
 
     def validate_rating(self, value):
         return validate_half_star(value)

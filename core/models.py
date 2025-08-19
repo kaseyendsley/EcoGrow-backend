@@ -4,6 +4,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
+from django.db.models.signals import pre_save, post_delete
+from django.dispatch import receiver
+
 
 class User(AbstractUser):
     profile_img = models.URLField(blank=True, null=True)
@@ -64,6 +67,7 @@ class UserQuest(models.Model):
         on_delete=models.CASCADE,
         related_name="user_quests",
     )
+    photo = models.ImageField(upload_to="user_quests/%Y/%m/%d/", blank=True, null=True)
 
     # progress
     completed = models.BooleanField(default=False)
@@ -89,3 +93,30 @@ class UserQuest(models.Model):
         status = "completed" if self.completed else "in-progress"
         return f"UserQuest(user={self.user_id}, quest={self.quest_id}, {status})"
 
+# --- File cleanup helpers ---
+
+@receiver(pre_save, sender=UserQuest)
+def delete_old_photo_on_change(sender, instance, **kwargs):
+    """
+    If a new photo is uploaded, delete the previous file from storage.
+    """
+    if not instance.pk:
+        return
+    try:
+        old = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+    old_file = getattr(old, "photo", None)
+    new_file = getattr(instance, "photo", None)
+    if old_file and old_file.name and old_file != new_file:
+        if old_file.storage.exists(old_file.name):
+            old_file.storage.delete(old_file.name)
+
+@receiver(post_delete, sender=UserQuest)
+def delete_photo_on_delete(sender, instance, **kwargs):
+    """
+    When a UserQuest is deleted, also remove its photo file.
+    """
+    f = getattr(instance, "photo", None)
+    if f and f.name and f.storage.exists(f.name):
+        f.storage.delete(f.name)
