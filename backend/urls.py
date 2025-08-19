@@ -25,6 +25,8 @@ from core.views.logout_views import LogoutView
 from core.views.quest_views import QuestViewSet
 from core.views.user_quest_views import UserQuestViewSet 
 from core.views.catalog_views import CategoryViewSet, TagViewSet, DifficultyViewSet, IconViewSet 
+from core.views.user_views import UserProfileViewSet
+
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -35,7 +37,9 @@ router.register(r"user-quests", UserQuestViewSet, basename="userquest")
 router.register(r"categories", CategoryViewSet, basename="category")     
 router.register(r"tags", TagViewSet, basename="tag")                    
 router.register(r"difficulties", DifficultyViewSet, basename="difficulty") 
-router.register(r"icons", IconViewSet, basename="icon")                 
+router.register(r"icons", IconViewSet, basename="icon")  
+router.register(r"users", UserProfileViewSet, basename="user")
+
 
 
 urlpatterns = [

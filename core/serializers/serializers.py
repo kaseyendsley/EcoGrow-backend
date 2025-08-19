@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from core.models import Category, Icon, Difficulty, Tag, Quest, UserQuest
 from decimal import Decimal
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -139,3 +141,34 @@ class CompleteUserQuestSerializer(serializers.ModelSerializer):
         if not value or not value.strip():
             raise serializers.ValidationError("Reflection is required.")
         return value
+
+class PublicUserProfileSerializer(serializers.ModelSerializer):
+    """
+    Public view of a user profile (no email).
+    """
+    quests_created_count = serializers.SerializerMethodField()
+    user_quests_completed_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User  # resolved via get_user_model()
+        fields = (
+            "id",
+            "username",
+            "profile_img",
+            "quests_created_count",
+            "user_quests_completed_count",
+        )
+
+    def get_quests_created_count(self, obj):
+        return Quest.objects.filter(created_by=obj).count()
+
+    def get_user_quests_completed_count(self, obj):
+        return UserQuest.objects.filter(user=obj, completed=True).count()
+
+
+class OwnUserProfileSerializer(PublicUserProfileSerializer):
+    """
+    Private view for the current user (includes email).
+    """
+    class Meta(PublicUserProfileSerializer.Meta):
+        fields = PublicUserProfileSerializer.Meta.fields + ("email",)

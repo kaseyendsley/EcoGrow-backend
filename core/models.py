@@ -49,7 +49,8 @@ class Quest(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="quests")
     icon = models.ForeignKey(Icon, on_delete=models.PROTECT, related_name="quests")
     is_custom = models.BooleanField(default=False)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="created_quests")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name="created_quests", null=True,
+        blank=True)
     tags = models.ManyToManyField(Tag, related_name="quests", blank=True)
 
     def __str__(self):
