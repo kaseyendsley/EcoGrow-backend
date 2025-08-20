@@ -172,3 +172,38 @@ class OwnUserProfileSerializer(PublicUserProfileSerializer):
     """
     class Meta(PublicUserProfileSerializer.Meta):
         fields = PublicUserProfileSerializer.Meta.fields + ("email",)
+
+
+class UserMiniSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    profile_img = serializers.CharField(allow_null=True, required=False)  # or URLField if you prefer
+
+
+def serialize_activity_item(item, *, quest_serializer_cls, userquest_serializer_cls):
+    """
+    item: dict with keys
+      - type: "quest_created" | "userquest_completed"
+      - ts: datetime
+      - user: django User object
+      - quest: Quest instance or None
+      - userquest: UserQuest instance or None
+    """
+    base = {
+        "type": item["type"],
+        "ts": item["ts"].isoformat().replace("+00:00", "Z"),  # normalize for frontend
+        "user": {
+            "id": item["user"].id,
+            "username": item["user"].username,
+            # adapt if your user has `profile_img` somewhere else:
+            "profile_img": getattr(item["user"], "profile_img", None),
+        },
+    }
+
+    if item["type"] == "quest_created" and item["quest"] is not None:
+        base["quest"] = quest_serializer_cls(item["quest"]).data
+
+    if item["type"] == "userquest_completed" and item["userquest"] is not None:
+        base["user_quest"] = userquest_serializer_cls(item["userquest"]).data
+
+    return base
