@@ -128,7 +128,7 @@ class CompleteUserQuestSerializer(serializers.ModelSerializer):
     No external links allowed.
     """
     rating = serializers.DecimalField(max_digits=2, decimal_places=1)
-    photo = serializers.ImageField(required=True)  # upload-only requirement
+    photo = serializers.ImageField(required=False, allow_null=True)  # upload-only requirement
 
     class Meta:
         model = UserQuest
