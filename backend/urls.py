@@ -26,6 +26,7 @@ from core.views.quest_views import QuestViewSet
 from core.views.user_quest_views import UserQuestViewSet 
 from core.views.catalog_views import CategoryViewSet, TagViewSet, DifficultyViewSet, IconViewSet 
 from core.views.user_views import UserProfileViewSet
+from core.views.subscription_views import SubscriptionViewSet 
 
 
 from django.conf import settings
@@ -39,6 +40,7 @@ router.register(r"tags", TagViewSet, basename="tag")
 router.register(r"difficulties", DifficultyViewSet, basename="difficulty") 
 router.register(r"icons", IconViewSet, basename="icon")  
 router.register(r"users", UserProfileViewSet, basename="user")
+router.register(r"subscriptions", SubscriptionViewSet, basename="subscription")
 
 
 
